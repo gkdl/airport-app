@@ -1,0 +1,91 @@
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: airport-batch
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/vpc-access-connector: projects/PROJECT_ID/locations/asia-northeast3/connectors/airport-vpc-connector
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - image: asia-northeast3-docker.pkg.dev/PROJECT_ID/airport-app/batch:latest
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 1Gi
+              env:
+                - name: NODE_ENV
+                  value: production
+                - name: DB_PORT
+                  value: "1521"
+                - name: DB_SID
+                  value: ORCL
+                - name: REDIS_PORT
+                  value: "6379"
+                - name: BATCH_CONCURRENCY
+                  value: "5"
+                - name: DB_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-db-host
+                      key: latest
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-db-user
+                      key: latest
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-db-password
+                      key: latest
+                - name: REDIS_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-redis-host
+                      key: latest
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-redis-password
+                      key: latest
+                - name: INCHEON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-incheon-api-key
+                      key: latest
+                - name: KAC_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-kac-api-key
+                      key: latest
+                - name: KMA_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-kma-api-key
+                      key: latest
+                - name: FIREBASE_PROJECT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-firebase-project-id
+                      key: latest
+                - name: FIREBASE_CLIENT_EMAIL
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-firebase-client-email
+                      key: latest
+                - name: FIREBASE_PRIVATE_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-firebase-key
+                      key: latest
+                - name: SLACK_WEBHOOK_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: airport-slack-webhook
+                      key: latest

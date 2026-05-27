@@ -1,0 +1,91 @@
+# GCP Cloud Build — API + Batch 서버 빌드 및 Cloud Run 배포
+# 트리거: main 브랜치 push
+
+steps:
+  # ── 1. API 서버 Docker 이미지 빌드 ──────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: build-api
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/api:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/api:latest'
+      - -f
+      - apps/api/Dockerfile
+      - .
+
+  # ── 2. Batch 서버 Docker 이미지 빌드 ────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: build-batch
+    args:
+      - build
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/batch:${SHORT_SHA}'
+      - -t
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/batch:latest'
+      - -f
+      - apps/batch/Dockerfile
+      - .
+
+  # ── 3. 이미지 push ───────────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: push-api
+    waitFor: ['build-api']
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/api'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: push-batch
+    waitFor: ['build-batch']
+    args:
+      - push
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/batch'
+
+  # ── 4. API 서버 Cloud Run 배포 ──────────────────────────────────
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: deploy-api
+    waitFor: ['push-api']
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - airport-api
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/api:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      - --allow-unauthenticated
+      - --min-instances=1
+      - --max-instances=10
+      - --memory=512Mi
+      - --cpu=1
+      - --port=3000
+      - --set-secrets=DB_HOST=airport-db-host:latest,DB_PASSWORD=airport-db-password:latest,JWT_SECRET=airport-jwt-secret:latest,REDIS_HOST=airport-redis-host:latest,REDIS_PASSWORD=airport-redis-password:latest
+
+  # ── 5. Batch 서버 Cloud Run Jobs 배포 ───────────────────────────
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: deploy-batch
+    waitFor: ['push-batch']
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - update
+      - airport-batch
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/batch:${SHORT_SHA}
+      - --region=${_REGION}
+      - --set-secrets=DB_HOST=airport-db-host:latest,DB_PASSWORD=airport-db-password:latest,INCHEON_API_KEY=airport-incheon-api-key:latest,KAC_API_KEY=airport-kac-api-key:latest,KMA_API_KEY=airport-kma-api-key:latest,REDIS_HOST=airport-redis-host:latest,FIREBASE_PRIVATE_KEY=airport-firebase-key:latest
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/api:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/airport-app/batch:${SHORT_SHA}'
+
+substitutions:
+  _REGION: asia-northeast3  # 서울 리전
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
