@@ -1,10 +1,19 @@
 import axios from 'axios';
 import { ApiResponse } from '@airport-app/types';
+import { getToken } from './auth';
 
 export type { FlightStatusEntity } from './types';
 
 const http = axios.create({
   baseURL: process.env['NEXT_PUBLIC_API_BASE_URL'] ?? 'http://localhost:3000/v1',
+});
+
+http.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export interface FlightQueryDto {
@@ -61,8 +70,18 @@ export const WeatherApi = {
 };
 
 export const BatchApi = {
-  fetchLogs: async () => {
-    const { data } = await http.get('/admin/batch-logs');
+  fetchLogs: async (params?: { jobName?: string; limit?: number }) => {
+    const { data } = await http.get('/admin/batch-logs', { params });
     return data;
+  },
+};
+
+export const AdminAuthApi = {
+  login: async (email: string, password: string): Promise<{ accessToken: string }> => {
+    const { data } = await http.post<{ data: { accessToken: string } }>(
+      '/admin/auth/login',
+      { email, password },
+    );
+    return data.data;
   },
 };
