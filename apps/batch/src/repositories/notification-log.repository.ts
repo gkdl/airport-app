@@ -1,0 +1,16 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NotificationLogEntity } from '../entities/notification-log.entity';
+
+@Injectable()
+export class NotificationLogRepository {
+  constructor(
+    @InjectRepository(NotificationLogEntity)
+    private readonly repo: Repository<NotificationLogEntity>,
+  ) {}
+
+  async save(entity: NotificationLogEntity): Promise<void> {
+    await this.repo.save(entity);
+  }
+}
