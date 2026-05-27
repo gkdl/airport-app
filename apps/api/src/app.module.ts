@@ -18,17 +18,25 @@ import { AdminModule } from './admin/admin.module';
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: 'oracle',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT', 1521),
-        sid: config.get<string>('DB_SID'),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASSWORD'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: false,
-        logging: config.get('NODE_ENV') !== 'production',
-      }),
+      useFactory: (config: ConfigService) => {
+        const connectString = config.get<string>('DB_CONNECT_STRING');
+        return {
+          type: 'oracle',
+          // Wallet 사용 시 connectString(TNS alias), 미사용 시 host/port/sid
+          ...(connectString
+            ? { connectString }
+            : {
+                host: config.get<string>('DB_HOST'),
+                port: config.get<number>('DB_PORT', 1521),
+                sid: config.get<string>('DB_SID'),
+              }),
+          username: config.get<string>('DB_USER'),
+          password: config.get<string>('DB_PASSWORD'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: false,
+          logging: config.get('NODE_ENV') !== 'production',
+        };
+      },
       inject: [ConfigService],
     }),
 

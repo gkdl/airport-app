@@ -37,3 +37,10 @@ coverage/
 # TypeORM migrations auto-generated
 apps/api/src/migrations/
 apps/batch/src/migrations/
+
+# Oracle Wallet (절대 커밋하지 말 것)
+wallet/
+**/wallet/
+*.sso
+*.p12
+ojdbc.properties

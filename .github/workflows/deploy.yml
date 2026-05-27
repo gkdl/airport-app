@@ -71,14 +71,14 @@ jobs:
             --memory=512Mi \
             --cpu=1 \
             --port=3000 \
-            --set-secrets="DB_HOST=airport-db-host:latest,DB_USER=airport-db-user:latest,DB_PASSWORD=airport-db-password:latest,REDIS_HOST=airport-redis-host:latest,REDIS_PASSWORD=airport-redis-password:latest,JWT_SECRET=airport-jwt-secret:latest"
+            --set-secrets="ORACLE_WALLET_CWALLET_SSO=airport-oracle-wallet-cwallet-sso:latest,ORACLE_WALLET_EWALLET_P12=airport-oracle-wallet-ewallet-p12:latest,ORACLE_WALLET_TNSNAMES_ORA=airport-oracle-wallet-tnsnames-ora:latest,ORACLE_WALLET_SQLNET_ORA=airport-oracle-wallet-sqlnet-ora:latest,DB_CONNECT_STRING=airport-oracle-connect-string:latest,DB_USER=airport-db-user:latest,DB_PASSWORD=airport-db-password:latest,REDIS_HOST=airport-redis-host:latest,REDIS_PASSWORD=airport-redis-password:latest,JWT_SECRET=airport-jwt-secret:latest"
 
       - name: Deploy Batch to Cloud Run Jobs
         run: |
           gcloud run jobs update airport-batch \
             --image=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/airport-app/batch:${{ github.sha }} \
             --region=${{ env.REGION }} \
-            --set-secrets="DB_HOST=airport-db-host:latest,DB_USER=airport-db-user:latest,DB_PASSWORD=airport-db-password:latest,REDIS_HOST=airport-redis-host:latest,REDIS_PASSWORD=airport-redis-password:latest,INCHEON_API_KEY=airport-incheon-api-key:latest,KAC_API_KEY=airport-kac-api-key:latest,KMA_API_KEY=airport-kma-api-key:latest,FIREBASE_PROJECT_ID=airport-firebase-project-id:latest,FIREBASE_CLIENT_EMAIL=airport-firebase-client-email:latest,FIREBASE_PRIVATE_KEY=airport-firebase-key:latest,SLACK_WEBHOOK_URL=airport-slack-webhook:latest"
+            --set-secrets="ORACLE_WALLET_CWALLET_SSO=airport-oracle-wallet-cwallet-sso:latest,ORACLE_WALLET_EWALLET_P12=airport-oracle-wallet-ewallet-p12:latest,ORACLE_WALLET_TNSNAMES_ORA=airport-oracle-wallet-tnsnames-ora:latest,ORACLE_WALLET_SQLNET_ORA=airport-oracle-wallet-sqlnet-ora:latest,DB_CONNECT_STRING=airport-oracle-connect-string:latest,DB_USER=airport-db-user:latest,DB_PASSWORD=airport-db-password:latest,REDIS_HOST=airport-redis-host:latest,REDIS_PASSWORD=airport-redis-password:latest,INCHEON_API_KEY=airport-incheon-api-key:latest,KAC_API_KEY=airport-kac-api-key:latest,KMA_API_KEY=airport-kma-api-key:latest,FIREBASE_PROJECT_ID=airport-firebase-project-id:latest,FIREBASE_CLIENT_EMAIL=airport-firebase-client-email:latest,FIREBASE_PRIVATE_KEY=airport-firebase-key:latest,SLACK_WEBHOOK_URL=airport-slack-webhook:latest"
 
       - name: Notify deployment
         run: |

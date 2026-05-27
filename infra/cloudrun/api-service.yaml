@@ -28,42 +28,58 @@ spec:
               value: production
             - name: PORT
               value: "3000"
-            - name: DB_PORT
-              value: "1521"
-            - name: DB_SID
-              value: ORCL
             - name: JWT_EXPIRES_IN
               value: 7d
             - name: REDIS_PORT
               value: "6379"
-          # Secret Manager에서 민감 정보 주입
-          - name: DB_HOST
-            valueFrom:
-              secretKeyRef:
-                name: airport-db-host
-                key: latest
-          - name: DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: airport-db-user
-                key: latest
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: airport-db-password
-                key: latest
-          - name: REDIS_HOST
-            valueFrom:
-              secretKeyRef:
-                name: airport-redis-host
-                key: latest
-          - name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: airport-redis-password
-                key: latest
-          - name: JWT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: airport-jwt-secret
-                key: latest
+            # Oracle Wallet (entrypoint.sh 에서 /tmp/wallet/ 에 복원)
+            - name: ORACLE_WALLET_CWALLET_SSO
+              valueFrom:
+                secretKeyRef:
+                  name: airport-oracle-wallet-cwallet-sso
+                  key: latest
+            - name: ORACLE_WALLET_EWALLET_P12
+              valueFrom:
+                secretKeyRef:
+                  name: airport-oracle-wallet-ewallet-p12
+                  key: latest
+            - name: ORACLE_WALLET_TNSNAMES_ORA
+              valueFrom:
+                secretKeyRef:
+                  name: airport-oracle-wallet-tnsnames-ora
+                  key: latest
+            - name: ORACLE_WALLET_SQLNET_ORA
+              valueFrom:
+                secretKeyRef:
+                  name: airport-oracle-wallet-sqlnet-ora
+                  key: latest
+            - name: DB_CONNECT_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: airport-oracle-connect-string
+                  key: latest
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: airport-db-user
+                  key: latest
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airport-db-password
+                  key: latest
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: airport-redis-host
+                  key: latest
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: airport-redis-password
+                  key: latest
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: airport-jwt-secret
+                  key: latest

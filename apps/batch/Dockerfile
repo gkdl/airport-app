@@ -18,4 +18,6 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=builder /app/apps/batch/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-CMD ["node", "dist/main"]
+COPY apps/batch/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

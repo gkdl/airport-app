@@ -21,8 +21,25 @@ create_secret() {
 
 echo "=== Creating Airport App Secrets ==="
 
-# DB 접속 정보 — 실제 값으로 교체
-create_secret "airport-db-host"     "YOUR_ORACLE_DB_HOST"
+# ── Oracle Wallet ─────────────────────────────────────────────────────────
+# wallet/ 디렉토리에 4개 파일이 있어야 합니다:
+#   cwallet.sso  ewallet.p12  tnsnames.ora  sqlnet.ora
+# 실행 예: bash infra/secrets-init.sh /path/to/wallet
+WALLET_DIR=${1:-./wallet}
+if [ -d "$WALLET_DIR" ]; then
+  echo "Encoding Oracle Wallet files from $WALLET_DIR ..."
+  create_secret "airport-oracle-wallet-cwallet-sso"  "$(base64 -w0 "$WALLET_DIR/cwallet.sso")"
+  create_secret "airport-oracle-wallet-ewallet-p12"  "$(base64 -w0 "$WALLET_DIR/ewallet.p12")"
+  create_secret "airport-oracle-wallet-tnsnames-ora" "$(base64 -w0 "$WALLET_DIR/tnsnames.ora")"
+  create_secret "airport-oracle-wallet-sqlnet-ora"   "$(base64 -w0 "$WALLET_DIR/sqlnet.ora")"
+  echo "  [INPUT] DB_CONNECT_STRING (tnsnames.ora의 alias, 예: mydb_high): "
+  read -r CONNECT_STRING
+  create_secret "airport-oracle-connect-string" "$CONNECT_STRING"
+else
+  echo "  [SKIP] wallet 디렉토리 없음 ($WALLET_DIR) — Oracle Wallet 시크릿 건너뜀"
+fi
+
+# DB 접속 정보
 create_secret "airport-db-user"     "airport_user"
 create_secret "airport-db-password" "YOUR_DB_PASSWORD"
 

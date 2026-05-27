@@ -18,5 +18,7 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY apps/api/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 EXPOSE 3000
-CMD ["node", "dist/main"]
+ENTRYPOINT ["/entrypoint.sh"]
