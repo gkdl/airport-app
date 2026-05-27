@@ -4,13 +4,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminUserEntity } from '../entities/admin-user.entity';
+import { BatchLogEntity } from '../entities/batch-log.entity';
 import { AdminController } from './admin.controller';
+import { BatchLogController } from './batch-log.controller';
 import { AdminService } from './admin.service';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdminUserEntity]),
+    TypeOrmModule.forFeature([AdminUserEntity, BatchLogEntity]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -21,7 +23,7 @@ import { JwtStrategy } from './jwt.strategy';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AdminController],
+  controllers: [AdminController, BatchLogController],
   providers: [AdminService, JwtStrategy],
 })
 export class AdminModule {}
