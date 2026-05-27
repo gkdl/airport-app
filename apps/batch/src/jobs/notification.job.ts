@@ -52,37 +52,42 @@ export class NotificationJob extends WorkerHost {
 
     const devices = await this.deviceRepo.findPushTokensByFlightNo(flightNo, airportCode);
 
-    for (const device of devices) {
-      if (!device.pushToken) continue;
-      if (notifyType === 'DELAY' && !device.notifyDelay) continue;
-      if (notifyType === 'CANCEL' && !device.notifyCancel) continue;
-      if (notifyType === 'BOARDING' && !device.notifyBoarding) continue;
+    const eligible = devices.filter((d) => {
+      if (!d.pushToken) return false;
+      if (notifyType === 'DELAY' && !d.notifyDelay) return false;
+      if (notifyType === 'CANCEL' && !d.notifyCancel) return false;
+      if (notifyType === 'BOARDING' && !d.notifyBoarding) return false;
+      return true;
+    });
 
-      const log = new NotificationLogEntity();
-      log.deviceId = device.deviceId;
-      log.flightNo = flightNo;
-      log.notifyType = notifyType;
-      log.title = this.buildTitle(flightNo, newStatus);
-      log.body = this.buildBody(flightNo, prevStatus, newStatus);
+    await Promise.allSettled(
+      eligible.map(async (device) => {
+        const log = new NotificationLogEntity();
+        log.deviceId = device.deviceId;
+        log.flightNo = flightNo;
+        log.notifyType = notifyType;
+        log.title = this.buildTitle(flightNo, newStatus);
+        log.body = this.buildBody(flightNo, prevStatus, newStatus);
 
-      try {
-        if (this.firebaseApp) {
-          await admin.messaging(this.firebaseApp).send({
-            token: device.pushToken,
-            notification: { title: log.title, body: log.body ?? undefined },
-            data: { flightNo, airportCode, status: newStatus },
-          });
-          log.isSent = 1;
-          log.sentAt = new Date();
+        try {
+          if (this.firebaseApp) {
+            await admin.messaging(this.firebaseApp).send({
+              token: device.pushToken!,
+              notification: { title: log.title, body: log.body ?? undefined },
+              data: { flightNo, airportCode, status: newStatus },
+            });
+            log.isSent = 1;
+            log.sentAt = new Date();
+          }
+        } catch (error) {
+          log.isSent = 0;
+          log.errorMsg = error instanceof Error ? error.message : String(error);
+          this.logger.error(`FCM send failed for ${device.deviceId}: ${log.errorMsg}`);
         }
-      } catch (error) {
-        log.isSent = 0;
-        log.errorMsg = error instanceof Error ? error.message : String(error);
-        this.logger.error(`FCM send failed for ${device.deviceId}: ${log.errorMsg}`);
-      }
 
-      await this.notifLogRepo.save(log);
-    }
+        await this.notifLogRepo.save(log);
+      }),
+    );
   }
 
   private resolveNotifyType(status: string): string | null {

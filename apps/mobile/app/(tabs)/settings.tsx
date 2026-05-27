@@ -17,6 +17,10 @@ export default function SettingsScreen() {
     useAppStore();
   const qc = useQueryClient();
 
+  const notifMutation = useMutation({
+    mutationFn: (on: boolean) => DeviceApi.updateNotification(deviceId!, on),
+  });
+
   const { data: favData } = useQuery({
     queryKey: queryKeys.favorites.list(deviceId ?? ''),
     queryFn: () => DeviceApi.getFavorites(deviceId!),
@@ -52,7 +56,14 @@ export default function SettingsScreen() {
         <View className="bg-white rounded-xl mb-4 p-4">
           <View className="flex-row justify-between items-center">
             <Text className="font-medium">푸시 알림</Text>
-            <Switch value={isNotificationOn} onValueChange={toggleNotification} />
+            <Switch
+              value={isNotificationOn}
+              onValueChange={(on) => {
+                toggleNotification();
+                if (deviceId) notifMutation.mutate(on);
+              }}
+              disabled={notifMutation.isPending}
+            />
           </View>
         </View>
 

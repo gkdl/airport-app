@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { DeviceService } from './device.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdatePushTokenDto } from './dto/update-push-token.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 
 @ApiTags('devices')
@@ -20,6 +21,12 @@ export class DeviceController {
   @ApiOperation({ summary: 'FCM 토큰 갱신' })
   async updatePushToken(@Param('deviceId') deviceId: string, @Body() dto: UpdatePushTokenDto) {
     return this.deviceService.updatePushToken(deviceId, dto);
+  }
+
+  @Patch(':deviceId/notification')
+  @ApiOperation({ summary: '알림 수신 설정 변경' })
+  async updateNotification(@Param('deviceId') deviceId: string, @Body() dto: UpdateNotificationDto) {
+    return this.deviceService.updateNotification(deviceId, dto);
   }
 
   @Get(':deviceId/favorites')

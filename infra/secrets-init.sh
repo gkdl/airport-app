@@ -33,10 +33,11 @@ create_secret "airport-redis-password" "YOUR_REDIS_PASSWORD"
 # JWT
 create_secret "airport-jwt-secret" "$(openssl rand -base64 32)"
 
-# 공공 API 키
-create_secret "airport-incheon-api-key" "YOUR_INCHEON_API_KEY"
-create_secret "airport-kac-api-key"     "YOUR_KAC_API_KEY"
-create_secret "airport-kma-api-key"     "YOUR_KMA_API_KEY"
+# 공공데이터포털 API 키 (3개 서비스 동일한 키)
+DATA_GO_KR_KEY="72c38aa5702634c276f66dfe788ef1a0d73de7625e521dc79c680107bacbea39"
+create_secret "airport-incheon-api-key" "$DATA_GO_KR_KEY"
+create_secret "airport-kac-api-key"     "$DATA_GO_KR_KEY"
+create_secret "airport-kma-api-key"     "$DATA_GO_KR_KEY"
 
 # Firebase
 create_secret "airport-firebase-project-id"    "YOUR_FIREBASE_PROJECT_ID"

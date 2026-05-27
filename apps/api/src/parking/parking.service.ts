@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { calcCongestionLevel } from '@airport-app/utils';
 import { ParkingStatusEntity } from '../entities/parking-status.entity';
 import { ParkingQueryDto } from './dto/parking-query.dto';
 
@@ -30,8 +31,8 @@ export class ParkingService {
 
     const total = parseInt(result?.totalSpots ?? '0', 10);
     const available = parseInt(result?.availableSpots ?? '0', 10);
-    const ratio = total > 0 ? (total - available) / total : 0;
-    const congestionLevel = ratio < 0.7 ? 'AVAILABLE' : ratio < 0.85 ? 'NORMAL' : ratio < 0.95 ? 'CONGESTED' : 'FULL';
+    const occupied = total - available;
+    const congestionLevel = calcCongestionLevel(occupied, total);
 
     return { airportCode, totalSpots: total, availableSpots: available, congestionLevel };
   }

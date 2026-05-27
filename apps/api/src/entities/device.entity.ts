@@ -15,8 +15,12 @@ export class DeviceEntity {
   @Column({ name: 'APP_VERSION', length: 20, nullable: true })
   appVersion?: string;
 
-  @Column({ name: 'NOTIFICATION_ON', default: 1 })
-  notificationOn!: number;
+  @Column({
+    name: 'NOTIFICATION_ON',
+    default: 1,
+    transformer: { to: (v: boolean) => (v ? 1 : 0), from: (v: number) => v === 1 },
+  })
+  notificationOn!: boolean;
 
   @CreateDateColumn({ name: 'CREATED_AT' })
   createdAt!: Date;

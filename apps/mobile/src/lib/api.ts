@@ -65,4 +65,8 @@ export const DeviceApi = {
       .then((r) => r.data),
   removeFavorite: (deviceId: string, favoriteId: number) =>
     http.delete(`/devices/${deviceId}/favorites/${favoriteId}`).then((r) => r.data),
+  updateNotification: (deviceId: string, notificationOn: boolean) =>
+    http
+      .patch<ApiResponse<Device>>(`/devices/${deviceId}/notification`, { notificationOn })
+      .then((r) => r.data),
 };

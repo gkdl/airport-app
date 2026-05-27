@@ -5,6 +5,7 @@ import { DeviceEntity } from '../entities/device.entity';
 import { FavoriteFlightEntity } from '../entities/favorite-flight.entity';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdatePushTokenDto } from './dto/update-push-token.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 
 @Injectable()
@@ -34,6 +35,13 @@ export class DeviceService {
     const device = await this.deviceRepo.findOne({ where: { deviceId } });
     if (!device) throw new NotFoundException('Device not found');
     device.pushToken = dto.pushToken;
+    return this.deviceRepo.save(device);
+  }
+
+  async updateNotification(deviceId: string, dto: UpdateNotificationDto): Promise<DeviceEntity> {
+    const device = await this.deviceRepo.findOne({ where: { deviceId } });
+    if (!device) throw new NotFoundException('Device not found');
+    device.notificationOn = dto.notificationOn;
     return this.deviceRepo.save(device);
   }
 

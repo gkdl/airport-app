@@ -29,8 +29,9 @@ export class FlightStatusRepository {
   }
 
   async bulkUpsert(entities: FlightStatusEntity[]): Promise<void> {
-    for (const entity of entities) {
-      await this.upsert(entity);
+    const CHUNK = 20;
+    for (let i = 0; i < entities.length; i += CHUNK) {
+      await Promise.all(entities.slice(i, i + CHUNK).map((e) => this.upsert(e)));
     }
   }
 }

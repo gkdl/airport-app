@@ -82,12 +82,25 @@ export class KacFlightJob extends WorkerHost {
     entity.airline = String(item['airlineNm'] ?? '');
     entity.flightNo = String(item['flightId'] ?? '');
     entity.direction = String(item['inout'] ?? '') === 'O' ? 'DEPARTURE' : 'ARRIVAL';
+    entity.terminal = String(item['terminalId'] ?? '1') || '1';
     entity.scheduledTime = scheduledTime;
-    entity.status = String(item['flightStatusCode'] ?? 'SCHEDULED');
+    entity.estimatedTime = item['estimatedDateTime'] ? new Date(String(item['estimatedDateTime'])) : undefined;
+    entity.actualTime = item['realDateTime'] ? new Date(String(item['realDateTime'])) : undefined;
+    entity.status = this.mapStatus(String(item['flightStatusCode'] ?? ''));
+    entity.gate = String(item['gateNumber'] ?? '') || undefined;
     entity.origin = String(item['departAirportNm'] ?? '') || undefined;
     entity.destination = String(item['arriveAirportNm'] ?? '') || undefined;
     entity.flightType = String(item['domesticFlag'] ?? '') === 'D' ? 'DOMESTIC' : 'INTERNATIONAL';
     return entity;
+  }
+
+  private mapStatus(code: string): string {
+    const map: Record<string, string> = {
+      'OT': 'SCHEDULED', 'DL': 'DELAYED', 'CN': 'CANCELLED',
+      'DP': 'DEPARTED', 'AR': 'ARRIVED', 'BD': 'BOARDING',
+      'DV': 'DIVERTED', 'LD': 'LANDED',
+    };
+    return map[code] ?? 'SCHEDULED';
   }
 
   private async saveBatchLog(params: { jobName: string; airportCode?: string; status: 'SUCCESS' | 'FAIL'; recordsCount: number; startedAt: Date; errorMessage?: string }) {
