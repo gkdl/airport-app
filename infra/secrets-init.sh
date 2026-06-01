@@ -22,8 +22,10 @@ create_secret() {
 echo "=== Creating Airport App Secrets ==="
 
 # ── Oracle Wallet ─────────────────────────────────────────────────────────
+# kbo-summary 와 동일한 Oracle Autonomous DB (p0mpe7dp2i5vywqf) 사용.
 # wallet/ 디렉토리에 4개 파일이 있어야 합니다:
 #   cwallet.sso  ewallet.p12  tnsnames.ora  sqlnet.ora
+# kbo-summary 에서 사용하는 wallet 파일과 동일.
 # 실행 예: bash infra/secrets-init.sh /path/to/wallet
 WALLET_DIR=${1:-./wallet}
 if [ -d "$WALLET_DIR" ]; then
@@ -32,16 +34,15 @@ if [ -d "$WALLET_DIR" ]; then
   create_secret "airport-oracle-wallet-ewallet-p12"  "$(base64 -w0 "$WALLET_DIR/ewallet.p12")"
   create_secret "airport-oracle-wallet-tnsnames-ora" "$(base64 -w0 "$WALLET_DIR/tnsnames.ora")"
   create_secret "airport-oracle-wallet-sqlnet-ora"   "$(base64 -w0 "$WALLET_DIR/sqlnet.ora")"
-  echo "  [INPUT] DB_CONNECT_STRING (tnsnames.ora의 alias, 예: mydb_high): "
-  read -r CONNECT_STRING
-  create_secret "airport-oracle-connect-string" "$CONNECT_STRING"
+  # kbo-summary 와 동일 DB — connect string alias 고정
+  create_secret "airport-oracle-connect-string" "p0mpe7dp2i5vywqf_tp"
 else
   echo "  [SKIP] wallet 디렉토리 없음 ($WALLET_DIR) — Oracle Wallet 시크릿 건너뜀"
 fi
 
-# DB 접속 정보
-create_secret "airport-db-user"     "airport_user"
-create_secret "airport-db-password" "YOUR_DB_PASSWORD"
+# DB 접속 정보 (kbo-summary 와 동일 DB_USER / DB_PASSWORD)
+create_secret "airport-db-user"     "SCRIPT"
+create_secret "airport-db-password" "YOUR_DB_PASSWORD"  # kbo DB_PASSWORD 와 동일
 
 # Redis (Cloud Memorystore)
 create_secret "airport-redis-host"     "YOUR_REDIS_HOST"
