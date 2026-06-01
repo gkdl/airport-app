@@ -1,0 +1,63 @@
+# ===== Gradle =====
+.gradle/
+build/
+**/build/
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ===== Eclipse / VS Code =====
+.classpath
+.project
+.settings/
+.vscode/
+
+# ===== 환경 변수 =====
+.env
+*.env
+.env.*
+!.env.example
+
+# ===== Oracle 로컬 데이터 =====
+oracle_data/
+
+# ===== GCP Service Account Keys (절대 커밋 금지) =====
+gha-key.json
+*-sa.json
+service-account*.json
+
+# ===== Oracle Autonomous DB Wallet (절대 커밋 금지) =====
+wallet/
+Wallet*/
+*.sso
+*.p12
+tnsnames.ora
+sqlnet.ora
+keystore.jks
+truststore.jks
+ojdbc.properties
+# encode-wallet.ps1 산출물
+scripts/.wallet.b64.txt
+
+# ===== 로그 =====
+*.log
+logs/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Node / React Native (mobile) =====
+node_modules/
+.expo/
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+npm-debug.*
+yarn-error.*
+*.tsbuildinfo
+.expo-shared/
