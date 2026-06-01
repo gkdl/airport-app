@@ -44,6 +44,8 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
+        <AdBanner />
+
         <Text className="text-lg font-semibold mb-3">오늘 출발편</Text>
         <View className="gap-2">
           {topFlights.map((flight: FlightStatus) => (

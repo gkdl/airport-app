@@ -1,8 +1,9 @@
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useDeviceInit } from '../src/hooks/useDeviceInit';
-import { useAdMob } from '../src/hooks/useAdMob';
+import { initAds } from '../src/lib/initAds';
 import '../global.css';
 
 const queryClient = new QueryClient({
@@ -13,7 +14,13 @@ const queryClient = new QueryClient({
 
 function AppInitializer() {
   useDeviceInit();
-  useAdMob();
+
+  // Google AdMob SDK 초기화 (BannerAd 렌더링 전에 반드시 1회 필요)
+  // web 번들에서는 initAds.web.ts 의 no-op 가 자동 선택됨
+  useEffect(() => {
+    initAds();
+  }, []);
+
   return null;
 }
 

@@ -6,6 +6,7 @@ import { useAppStore } from '../../src/store/appStore';
 import { calcOccupancyRate } from '@airport-app/utils';
 import { colors } from '@airport-app/tokens';
 import { ParkingStatus } from '@airport-app/types';
+import { AdBanner } from '../../src/components/AdBanner';
 
 const LEVEL_COLORS: Record<string, string> = {
   AVAILABLE: colors.congestion.available,
@@ -38,6 +39,7 @@ export default function ParkingScreen() {
     >
       <View className="p-4">
         <Text className="text-2xl font-bold mb-4">주차 현황</Text>
+        <AdBanner />
         {parking.map((p: ParkingStatus) => {
           const pct = calcOccupancyRate(p.occupiedSpots, p.totalSpots);
           const color = LEVEL_COLORS[p.congestionLevel] ?? LEVEL_COLORS['NORMAL']!;

@@ -1,18 +1,38 @@
-import { Platform, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
-const ANDROID_ID = process.env.EXPO_PUBLIC_ADMOB_ANDROID_BANNER_ID ?? TestIds.ADAPTIVE_BANNER;
-const IOS_ID = process.env.EXPO_PUBLIC_ADMOB_IOS_BANNER_ID ?? TestIds.ADAPTIVE_BANNER;
-const AD_UNIT_ID = Platform.OS === 'ios' ? IOS_ID : ANDROID_ID;
+/**
+ * Google AdMob 배너 광고 (react-native-google-mobile-ads).
+ *
+ * - native module 이라 Expo Go 에서는 동작 안 함 (dev build / EAS build 필요)
+ * - web 빌드에서는 AdBanner.web.tsx 가 자동 선택되어 null 반환
+ * - __DEV__ 빌드에서는 Google 테스트 광고, 운영 빌드에서는 실제 광고 단위
+ *
+ * 운영 전 교체:
+ *   ANDROID_BANNER_UNIT_ID / IOS_BANNER_UNIT_ID 를 AdMob 콘솔에서 발급받은 실제 ID 로
+ *   형식: "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"
+ */
 
-interface Props {
-  size?: BannerAdSize;
-}
+// TODO: AdMob 콘솔 → 광고 단위 추가 → "배너" 형식으로 발급받은 후 교체
+const ANDROID_BANNER_UNIT_ID = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
+const IOS_BANNER_UNIT_ID = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
 
-export function AdBanner({ size = BannerAdSize.ANCHORED_ADAPTIVE_BANNER }: Props) {
+const realUnitId = Platform.OS === 'ios' ? IOS_BANNER_UNIT_ID : ANDROID_BANNER_UNIT_ID;
+const unitId = __DEV__ ? TestIds.BANNER : realUnitId;
+
+export function AdBanner() {
   return (
-    <View className="items-center my-2">
-      <BannerAd unitId={AD_UNIT_ID} size={size} requestOptions={{ requestNonPersonalizedAdsOnly: false }} />
+    <View style={styles.wrapper}>
+      <BannerAd
+        unitId={unitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        onAdLoaded={() => console.log('[AdBanner] loaded', unitId)}
+        onAdFailedToLoad={(err) => console.warn('[AdBanner] failed', unitId, err)}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: { alignItems: 'center', paddingVertical: 4 },
+});

@@ -9,6 +9,7 @@ import { useAppStore } from '../../src/store/appStore';
 import { formatTime } from '@airport-app/utils';
 import { colors } from '@airport-app/tokens';
 import { FlightStatus, FlightStatusCode } from '@airport-app/types';
+import { AdBanner } from '../../src/components/AdBanner';
 
 const STATUS_LABELS: Partial<Record<FlightStatusCode, string>> = {
   [FlightStatusCode.SCHEDULED]: '예정',
@@ -61,6 +62,7 @@ export default function FlightsScreen() {
         />
       </View>
 
+      <AdBanner />
       <FlashList
         data={flights}
         estimatedItemSize={80}
