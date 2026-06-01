@@ -33,6 +33,15 @@
         {
           "color": "#3b82f6"
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
+          "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
+          "userTrackingUsageDescription": "이 식별자는 맞춤형 광고 제공에 사용됩니다.",
+          "skAdNetworkItems": []
+        }
       ]
     ],
     "scheme": "airportapp",

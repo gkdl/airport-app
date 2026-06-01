@@ -6,6 +6,7 @@ import { useAppStore } from '../../src/store/appStore';
 import { FlightApi, ParkingApi } from '../../src/lib/api';
 import { formatTime } from '@airport-app/utils';
 import { FlightStatus } from '@airport-app/types';
+import { AdBanner } from '../../src/components/AdBanner';
 
 export default function HomeScreen() {
   const { defaultAirport } = useAppStore();
