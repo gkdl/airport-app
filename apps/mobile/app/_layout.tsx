@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useDeviceInit } from '../src/hooks/useDeviceInit';
+import { useAdMob } from '../src/hooks/useAdMob';
 import '../global.css';
 
 const queryClient = new QueryClient({
@@ -12,6 +13,7 @@ const queryClient = new QueryClient({
 
 function AppInitializer() {
   useDeviceInit();
+  useAdMob();
   return null;
 }
 
